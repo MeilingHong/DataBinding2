@@ -1,6 +1,7 @@
 package com.meiling.databinding;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.meiling.databinding.data.Data;
 import com.meiling.databinding.databinding.ActivityMainBinding;
@@ -26,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding.setNameEntity(data);
 
         // todo 8、ViewDataBinding对象可以使用  【.tvName[布局文件中，声明的值]】来直接获取对应的View组件，并进行对应的操作
-        activityMainBinding.tvName.setText("");
+        activityMainBinding.tvName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 }
