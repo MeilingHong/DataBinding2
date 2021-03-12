@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!--
+    todo 2、
+     选中根布局
+     Alt+Enter
+     选中[Convert to data binding layout]
+     会生成<layout>/<data>标签
+     将View组件和Object对象进行绑定需要使用到
+
+    todo 3、
+     <data>标签内使用<import>标签引入需要绑定的实体类
+     【避免在使用每一个<variable>标签时，需要每次在type内声明完整的实体类的完整路径】
+      java.lang.*  ;  下的类会被自动引入，所以不需要使用<import>标签显示声明
+
+    todo 4、
+     当需要绑定的实体类存在完全同名的情况时，可以使用 alias 别名来进行区别,<variable>中type值为声明的alias值
+
+    todo 5、
+     View组件中使用时，使用：@{[variable中name对应的值].需要使用到的实体类的属性}*** 例如下面的 nameEntity.name
+    -->
+    <data>
+        <import type="com.meiling.databinding.data.Data"/>
+        <variable
+            name="nameEntity"
+            type="Data" />
+
+        <import
+            alias="Data2"
+            type="com.meiling.databinding.data2.Data"/>
+        <variable
+            name="grander"
+            type="Data2" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{nameEntity.name}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
