@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.meiling.databinding.camerax.CameraXActivity;
+import com.meiling.databinding.camerax.CameraXCaptureImageActivity;
 import com.meiling.databinding.data.Data;
 import com.meiling.databinding.databinding.ActivityMainBinding;
 
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CODE);
                 } else {
-                    startActivity(new Intent(getApplicationContext(), CameraXActivity.class));
+                    startActivity(new Intent(getApplicationContext(), CameraXCaptureImageActivity.class));
                 }
             }
         });
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             if (PackageManager.PERMISSION_GRANTED == (grantResults == null ? -1 : grantResults[0])) {
                 // Take the user to the success fragment when permission is granted
                 Toast.makeText(getApplicationContext(), "Permission request granted", Toast.LENGTH_LONG).show();
-                startActivity(new Intent(getApplicationContext(), CameraXActivity.class));
+                startActivity(new Intent(getApplicationContext(), CameraXCaptureImageActivity.class));
             } else {
                 Toast.makeText(getApplicationContext(), "Permission request denied", Toast.LENGTH_LONG).show();
             }

@@ -45,7 +45,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-public class CameraXActivity extends AppCompatActivity {
+public class CameraXCaptureImageActivity extends AppCompatActivity {
     private final String TAG = "AndroidRuntime";
 
     private ActivityCameraxBinding activityCameraxBinding;
@@ -434,7 +434,7 @@ public class CameraXActivity extends AppCompatActivity {
                     });
                 }
 
-                shutSuccessFlash();//
+                shutSuccessFlash();// todo 如果在外面调用的话，将导致不论文件是否创建成功，都会出现闪一下的视觉效果，会给用户拍照成功的错觉
             }
 
             @Override
@@ -463,6 +463,10 @@ public class CameraXActivity extends AppCompatActivity {
                 }
             }, 100);
         }
+    }
+
+    private void setFlashMode(){
+        imageCapture.setFlashMode(ImageCapture.FLASH_MODE_AUTO);// todo  似乎只开放了设置闪光灯模式的API，而对焦的话，似乎API直接就封装了自动对焦
     }
 
 }
