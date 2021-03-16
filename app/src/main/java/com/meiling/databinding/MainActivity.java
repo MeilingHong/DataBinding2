@@ -1,16 +1,24 @@
 package com.meiling.databinding;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
+import com.meiling.databinding.camerax.CameraXActivity;
 import com.meiling.databinding.data.Data;
 import com.meiling.databinding.databinding.ActivityMainBinding;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 public class MainActivity extends AppCompatActivity {
     private Data data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,8 +38,29 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding.tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // todo 需要申请Camera权限
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CODE);
+                } else {
+                    startActivity(new Intent(getApplicationContext(), CameraXActivity.class));
+                }
             }
         });
+    }
+
+    private final int PERMISSIONS_REQUEST_CODE = 10;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            if (PackageManager.PERMISSION_GRANTED == (grantResults == null ? -1 : grantResults[0])) {
+                // Take the user to the success fragment when permission is granted
+                Toast.makeText(getApplicationContext(), "Permission request granted", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(getApplicationContext(), CameraXActivity.class));
+            } else {
+                Toast.makeText(getApplicationContext(), "Permission request denied", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
