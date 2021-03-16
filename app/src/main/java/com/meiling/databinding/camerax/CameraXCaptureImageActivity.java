@@ -469,4 +469,23 @@ public class CameraXCaptureImageActivity extends AppCompatActivity {
         imageCapture.setFlashMode(ImageCapture.FLASH_MODE_AUTO);// todo  似乎只开放了设置闪光灯模式的API，而对焦的话，似乎API直接就封装了自动对焦
     }
 
+    private void doFocus() {// 默认就是连续自动对焦
+        if(mCamera!=null){
+//            mCamera.getCameraControl().startFocusAndMetering(new FocusMeteringAction.Builder().);
+        }
+    }
+
+    private void setZoom(){// 设置缩放
+        if(mCamera!=null){
+            mCamera.getCameraControl().setZoomRatio(mCamera.getCameraInfo().getZoomState().getValue().getMaxZoomRatio());// todo 设置范围在下面这两个值之间，设置不对时，会抛出异常
+            mCamera.getCameraInfo().getZoomState().getValue().getMaxZoomRatio();
+            mCamera.getCameraInfo().getZoomState().getValue().getMinZoomRatio();
+
+            mCamera.getCameraControl().setLinearZoom(1);//todo 【 0 ~ 1 FLoat】
+
+            mCamera.getCameraInfo().getZoomState().getValue().getLinearZoom();
+            mCamera.getCameraInfo().getZoomState().getValue().getZoomRatio();
+        }
+    }
+
 }
