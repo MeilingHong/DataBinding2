@@ -5,18 +5,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.meiling.databinding.R;
 import com.meiling.databinding.databinding.ActivityCameraxBinding;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +38,7 @@ import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
@@ -157,8 +167,21 @@ public class CameraXActivity extends AppCompatActivity {
          * todo 当使用非data目录存储文件时，会存在一个访问隔离的问题，如果需要访问到其他文件，需要使用到MANAGE_EXTERNAL_STORAGE权限，否则将会导致使用File进行访问时，
          *  无法访问到该路径下的文件（文件实际存在，但权限隔离导致访问被拒绝）【open failed: EPERM (Operation not permitted)】
          */
-//        outputDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        outputDirectory = getExternalFilesDir(null);// todo 保险起见，使用data目录进行访问
+        outputDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);// todo 保险起见，使用data目录进行访问【这种方式既保证的向上的兼容，后保证了向下的兼容】
+//        if (Build.VERSION.SDK_INT >= 29) {
+//            outputDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        } else {
+//            outputDirectory = Environment.getExternalStorageDirectory();// todo 【这种方式发现在执行时会出现异常，导致拍到的文件无法进行存储】
+        /*
+        2021-03-16 15:29:28.084 25247-25403/com.meiling.databinding E/AndroidRuntime: Photo capture failed: ${exception.message}
+            androidx.camera.core.ImageCaptureException: Cannot save capture result to specified location
+                at androidx.camera.core.ImageCapture.lambda$takePicture$5(ImageCapture.java:799)
+                at androidx.camera.core.-$$Lambda$ImageCapture$wcrF0gZsLfYB9ZBrY3_kPHJuK5I.run(Unknown Source:2)
+                at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
+                at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+                at java.lang.Thread.run(Thread.java:764)
+         */
+//        }
         if (outputDirectory != null && outputDirectory.exists()) {
 
         } else {
@@ -234,13 +257,15 @@ public class CameraXActivity extends AppCompatActivity {
                 .build();
 
         imageCapture = new ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)// 可以修改参数，但最大模式将导致处理的时长边长
+//                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)// todo 可以修改参数，但最大模式将导致处理的时长边长
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)// ---- 实际修改后，发现并没有像想象的那样，文件像素更大
                 // We request aspect ratio but no resolution to match preview config, but letting
                 // CameraX optimize for whatever specific resolution best fits our use cases
                 .setTargetAspectRatio(screenAspectRatio)
                 // Set initial target rotation, we will have to call this again if rotation changes
                 // during the lifecycle of this use case
                 .setTargetRotation(rotation)
+                .setFlashMode(ImageCapture.FLASH_MODE_AUTO)// todo 设置闪光灯模式
                 .build();
 
         imageAnalyzer = new ImageAnalysis.Builder()
@@ -254,7 +279,7 @@ public class CameraXActivity extends AppCompatActivity {
         imageAnalyzer.setAnalyzer(cameraExecutor, new LuminosityAnalyzer(new LumaListener() {
             @Override
             public void analyzeResult(Double result) {
-                Log.i(TAG, "图片分析结果(计算的byte的平均值)：" + (result != null ? result.toString() : "null"));
+//                Log.i(TAG, "图片分析结果(计算的byte的平均值)：" + (result != null ? result.toString() : "null"));
             }
         }));
 
@@ -264,7 +289,7 @@ public class CameraXActivity extends AppCompatActivity {
         try {
             // A variable number of use-cases can be passed here -
             // camera provides access to CameraControl & CameraInfo
-            camera = cameraProvider.bindToLifecycle(
+            mCamera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture, imageAnalyzer);
             Log.w(TAG, "bindCameraUseCases  赋值Camera");
             // Attach the viewfinder's surface provider to preview use case
@@ -359,10 +384,85 @@ public class CameraXActivity extends AppCompatActivity {
     private Preview preview = null;
     private ImageCapture imageCapture = null;
     private ImageAnalysis imageAnalyzer = null;
-    private Camera camera = null;
+    private Camera mCamera = null;// 实际上，Camera在赋值后并没有起到什么作用
     private ProcessCameraProvider cameraProvider = null;
 
     private void doShutter() {// 执行拍照
+        Log.w(TAG, "doShutter 拍摄点击---(lensFacing)" + lensFacing + "---前0  后1");
+
+        // 创建输出文件
+        File photoFile = new File(outputDirectory, new SimpleDateFormat(FILENAME, Locale.US).format(System.currentTimeMillis()) + PHOTO_EXTENSION);
+
+        // 根据使用的是前/后摄像头，构建metadata
+        ImageCapture.Metadata metadata = new ImageCapture.Metadata();
+//        metadata.setReversedHorizontal(lensFacing == CameraSelector.LENS_FACING_FRONT);// 前置摄像头需要进行翻转
+        metadata.setReversedHorizontal(false);// 前置摄像头需要进行翻转
+
+        // 根据文件，以及metaData创建输出文件参数
+        ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).setMetadata(metadata).build();
+
+        imageCapture.takePicture(outputOptions, cameraExecutor, new ImageCapture.OnImageSavedCallback() {
+            @Override
+            public void onImageSaved(@NonNull ImageCapture.OutputFileResults output) {
+                Uri savedUri = output.getSavedUri() != null ? output.getSavedUri() : Uri.fromFile(photoFile);
+
+                // We can only change the foreground Drawable using API level 23+ API
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    // Update the gallery thumbnail with latest picture taken
+//                    setGalleryThumbnail(savedUri)
+                    // todo 有必要的话，这里加载文件，使得当前页面可以进行预览
+                }
+
+                // Implicit broadcasts will be ignored for devices running API level >= 24
+                // so if you only target API level 24+ you can remove this statement
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    sendBroadcast(new Intent(android.hardware.Camera.ACTION_NEW_PICTURE, savedUri));
+                }
+
+                // If the folder selected is an external media directory, this is
+                // unnecessary but otherwise other apps will not be able to access our
+                // images unless we scan them using [MediaScannerConnection]
+                String mimeType;
+                if ("file".equals(savedUri.getScheme())) {
+                    File temp = new File(savedUri.getPath());
+                    mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(temp.getName().substring(temp.getName().lastIndexOf(".") + 1));
+                    MediaScannerConnection.scanFile(getApplicationContext(), new String[]{temp.getAbsolutePath()}, new String[]{mimeType}, new MediaScannerConnection.OnScanCompletedListener() {
+                        @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.e(TAG, "doShutter onScanCompleted ：" + path + "---" + (uri != null ? uri.getPath() : "null"));
+                        }
+                    });
+                }
+
+                shutSuccessFlash();//
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                Log.e(TAG, "Photo capture failed: ${exception.message}", exception);
+            }
+        });
+
 
     }
+
+    private void shutSuccessFlash(){
+        // We can only change the foreground Drawable using API level 23+ API
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Display flash animation to indicate that photo was captured
+            activityCameraxBinding.container.postDelayed(new Runnable() {// 快速的显示屏闪，表示拍照成功
+                @Override
+                public void run() {
+                    activityCameraxBinding.container.setForeground(new ColorDrawable(Color.WHITE));
+                    activityCameraxBinding.container.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            activityCameraxBinding.container.setForeground(null);
+                        }
+                    }, 50);
+                }
+            }, 100);
+        }
+    }
+
 }
