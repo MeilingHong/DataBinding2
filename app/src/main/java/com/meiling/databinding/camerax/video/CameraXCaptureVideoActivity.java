@@ -1,4 +1,4 @@
-package com.meiling.databinding.camerax;
+package com.meiling.databinding.camerax.video;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,7 +21,9 @@ import android.webkit.MimeTypeMap;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.meiling.databinding.R;
-import com.meiling.databinding.databinding.ActivityCameraxBinding;
+import com.meiling.databinding.camerax.picture.LumaListener;
+import com.meiling.databinding.camerax.picture.LuminosityAnalyzer;
+import com.meiling.databinding.databinding.ActivityCameraxVideoBinding;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -36,7 +38,6 @@ import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
@@ -49,7 +50,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 public class CameraXCaptureVideoActivity extends AppCompatActivity {
     private final String TAG = "AndroidRuntime";
 
-    private ActivityCameraxBinding activityCameraxBinding;
+    private ActivityCameraxVideoBinding activityCameraxVideoBinding;
 
     private ExecutorService cameraExecutor;
     private LocalBroadcastManager localBroadcastManager;
@@ -62,17 +63,17 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityCameraxBinding = DataBindingUtil.setContentView(this, R.layout.activity_camerax);
+        activityCameraxVideoBinding = DataBindingUtil.setContentView(this, R.layout.activity_camerax_video);
 
         initExecutor();
         initVolumeReceiver();
         initDisplayManager();
         initOutputPath();
 
-        activityCameraxBinding.preview.post(new Runnable() {
+        activityCameraxVideoBinding.preview.post(new Runnable() {
             @Override
             public void run() {
-                mDisplayId = activityCameraxBinding.preview.getDisplay().getDisplayId();
+                mDisplayId = activityCameraxVideoBinding.preview.getDisplay().getDisplayId();
 
                 updateCameraUi();// onCreate preview Post
 
@@ -120,7 +121,7 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
             if (intent != null && intent.getIntExtra(Intent.EXTRA_KEY_EVENT, KeyEvent.KEYCODE_UNKNOWN) == KeyEvent.KEYCODE_VOLUME_DOWN) {
                 // 收到了，音量下键的点击
                 Log.w(TAG, "onReceive");
-                activityCameraxBinding.cameraCaptureButton.performClick();
+                activityCameraxVideoBinding.cameraCaptureButton.performClick();
             }
         }
     };
@@ -148,9 +149,9 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
         public void onDisplayChanged(int displayId) {
             Log.w(TAG, "onDisplayChanged(displayId):" + displayId + "---(mDisplayId)" + mDisplayId);
             if (displayId == mDisplayId) {
-                if (activityCameraxBinding != null && activityCameraxBinding.preview != null && activityCameraxBinding.preview.getDisplay() != null) {
-                    if (imageCapture != null) imageCapture.setTargetRotation(activityCameraxBinding.preview.getDisplay().getRotation());
-                    if (imageAnalyzer != null) imageAnalyzer.setTargetRotation(activityCameraxBinding.preview.getDisplay().getRotation());
+                if (activityCameraxVideoBinding != null && activityCameraxVideoBinding.preview != null && activityCameraxVideoBinding.preview.getDisplay() != null) {
+                    if (imageCapture != null) imageCapture.setTargetRotation(activityCameraxVideoBinding.preview.getDisplay().getRotation());
+                    if (imageAnalyzer != null) imageAnalyzer.setTargetRotation(activityCameraxVideoBinding.preview.getDisplay().getRotation());
                 }
             }
         }
@@ -230,16 +231,16 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
     private void bindCameraUseCases() {
         Log.w(TAG, "bindCameraUseCases");
         DisplayMetrics metrics = new DisplayMetrics();
-        if (activityCameraxBinding != null && activityCameraxBinding.preview != null && activityCameraxBinding.preview.getDisplay() != null) {
-            activityCameraxBinding.preview.getDisplay().getRealMetrics(metrics);// 获取屏幕的宽高
+        if (activityCameraxVideoBinding != null && activityCameraxVideoBinding.preview != null && activityCameraxVideoBinding.preview.getDisplay() != null) {
+            activityCameraxVideoBinding.preview.getDisplay().getRealMetrics(metrics);// 获取屏幕的宽高
         }
         Log.w(TAG, "bindCameraUseCases RealMetrics:(width)" + metrics.widthPixels + "---(height)" + metrics.heightPixels);
         int screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels);// 计算获取比例
         Log.w(TAG, "bindCameraUseCases  屏幕比例：" + screenAspectRatio + "--- AspectRatio.RATIO_4_3:" + AspectRatio.RATIO_4_3
                 + "--- AspectRatio.RATIO_16_9:" + AspectRatio.RATIO_16_9);
         int rotation = 0;
-        if (activityCameraxBinding != null && activityCameraxBinding.preview != null && activityCameraxBinding.preview.getDisplay() != null) {
-            rotation = activityCameraxBinding.preview.getDisplay().getRotation();//得到预览View的旋转角度
+        if (activityCameraxVideoBinding != null && activityCameraxVideoBinding.preview != null && activityCameraxVideoBinding.preview.getDisplay() != null) {
+            rotation = activityCameraxVideoBinding.preview.getDisplay().getRotation();//得到预览View的旋转角度
             Log.w(TAG, "bindCameraUseCases （旋转角度）：" + rotation);
         }
         if (this.cameraProvider != null) {
@@ -294,8 +295,8 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
                     this, cameraSelector, preview, imageCapture, imageAnalyzer);
             Log.w(TAG, "bindCameraUseCases  赋值Camera");
             // Attach the viewfinder's surface provider to preview use case
-            if (activityCameraxBinding != null && activityCameraxBinding.preview != null && activityCameraxBinding.preview.getSurfaceProvider() != null) {
-                preview.setSurfaceProvider(activityCameraxBinding.preview.getSurfaceProvider());
+            if (activityCameraxVideoBinding != null && activityCameraxVideoBinding.preview != null && activityCameraxVideoBinding.preview.getSurfaceProvider() != null) {
+                preview.setSurfaceProvider(activityCameraxVideoBinding.preview.getSurfaceProvider());
                 Log.w(TAG, "bindCameraUseCases  设置预览");
             }
             Log.w(TAG, "bindCameraUseCases  ---  End");
@@ -321,8 +322,8 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
         Log.w(TAG, "updateCameraUi");
         // todo 启动一个线程，读取最近的存储的文件，并展示最新的一个【kotlin使用的是专有的类】，Java考虑可以使用RxJava方式来执行
 
-        activityCameraxBinding.cameraSwitchButton.setEnabled(false);
-        activityCameraxBinding.cameraSwitchButton.setOnClickListener(new View.OnClickListener() {
+        activityCameraxVideoBinding.cameraSwitchButton.setEnabled(false);
+        activityCameraxVideoBinding.cameraSwitchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 切换
@@ -336,7 +337,7 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
             }
         });
 
-        activityCameraxBinding.cameraCaptureButton.setOnClickListener(new View.OnClickListener() {
+        activityCameraxVideoBinding.cameraCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.w(TAG, "updateCameraUi  拍照点击");
@@ -347,8 +348,8 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
 
     private void updateCameraSwitchButton() {
         Log.w(TAG, "updateCameraSwitchButton");
-        if (activityCameraxBinding != null && activityCameraxBinding.cameraSwitchButton != null) {
-            activityCameraxBinding.cameraSwitchButton.setEnabled(hasBackCamera() && hasFrontCamera());
+        if (activityCameraxVideoBinding != null && activityCameraxVideoBinding.cameraSwitchButton != null) {
+            activityCameraxVideoBinding.cameraSwitchButton.setEnabled(hasBackCamera() && hasFrontCamera());
         }
     }
 
@@ -451,14 +452,14 @@ public class CameraXCaptureVideoActivity extends AppCompatActivity {
         // We can only change the foreground Drawable using API level 23+ API
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Display flash animation to indicate that photo was captured
-            activityCameraxBinding.container.postDelayed(new Runnable() {// 快速的显示屏闪，表示拍照成功
+            activityCameraxVideoBinding.container.postDelayed(new Runnable() {// 快速的显示屏闪，表示拍照成功
                 @Override
                 public void run() {
-                    activityCameraxBinding.container.setForeground(new ColorDrawable(Color.WHITE));
-                    activityCameraxBinding.container.postDelayed(new Runnable() {
+                    activityCameraxVideoBinding.container.setForeground(new ColorDrawable(Color.WHITE));
+                    activityCameraxVideoBinding.container.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            activityCameraxBinding.container.setForeground(null);
+                            activityCameraxVideoBinding.container.setForeground(null);
                         }
                     }, 50);
                 }

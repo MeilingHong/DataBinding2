@@ -1,4 +1,4 @@
-package com.meiling.databinding.camerax;
+package com.meiling.databinding.camerax.picture;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

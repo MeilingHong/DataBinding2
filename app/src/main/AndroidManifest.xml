@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".camerax.CameraXCaptureImageActivity" />
+        <activity android:name=".camerax.picture.CameraXCaptureImageActivity" />
     </application>
 
 </manifest>

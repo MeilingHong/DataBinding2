@@ -1,4 +1,4 @@
-package com.meiling.databinding.camerax;
+package com.meiling.databinding.camerax.picture;
 
 /**
  * Created by marisareimu@126.com on 2021-03-15  16:55
