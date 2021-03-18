@@ -5,15 +5,16 @@ import android.view.View;
 
 import com.meiling.databinding.R;
 import com.meiling.databinding.base.BaseActivity;
-import com.meiling.databinding.databinding.BindTextView;
+import com.meiling.databinding.databinding.ActivityDataBindTextviewBinding;
 import com.meiling.databinding.log.Ulog;
 import com.meiling.databinding.viewmodel.data.Data;
 
 import java.util.Random;
 
-public class DataBindTextViewActivity extends BaseActivity<BindTextView> {
+public class DataBindTextViewActivity extends BaseActivity<ActivityDataBindTextviewBinding> {
     private Data data;
     private com.meiling.databinding.viewmodel.data2.Data data2;
+
     @Override
     protected int layoutViewId() {
         return R.layout.activity_data_bind_textview;

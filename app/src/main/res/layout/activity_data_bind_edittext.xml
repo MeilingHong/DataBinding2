@@ -26,9 +26,6 @@
         <variable
             name="nameEntity"
             type="com.meiling.databinding.viewmodel.data.Data" />
-        <variable
-            name="nameEntity2"
-            type="com.meiling.databinding.viewmodel.data2.Data" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,11 +45,16 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <!--
+        todo EditText 以下的写法就直接关联的Data对应的值，
+         使得在进行修改的时候，TextView对应的值也在进行变更
+         android:text="@={nameEntity.name}"
+        -->
+        <EditText
             android:id="@+id/tvName1"
-            android:layout_width="wrap_content"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:text="@={nameEntity.name1}"
+            android:text="@={nameEntity.name}"
             android:padding="10dp"
             android:background="#bbbbbb"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -60,27 +62,6 @@
             app:layout_constraintTop_toBottomOf="@id/tvName"
             />
 
-        <TextView
-            android:id="@+id/tvName2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@={nameEntity.name2}"
-            android:padding="10dp"
-            android:background="#3296fa"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvName1" />
-
-        <TextView
-            android:id="@+id/tvName3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@={nameEntity2.name}"
-            android:padding="10dp"
-            android:background="#bbbbbb"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvName2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
