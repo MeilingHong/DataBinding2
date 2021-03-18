@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class DataBindTextViewActivity extends BaseActivity<BindTextView> {
     private Data data;
-
+    private com.meiling.databinding.viewmodel.data2.Data data2;
     @Override
     protected int layoutViewId() {
         return R.layout.activity_data_bind_textview;
@@ -32,10 +32,14 @@ public class DataBindTextViewActivity extends BaseActivity<BindTextView> {
         data.setName1("自定义（setName1）");
         data.setName2("自定义（setName2）");
         data.setName3("自定义（setName3）");
+
+        data2 = new com.meiling.databinding.viewmodel.data2.Data();
+        data2.setName("Name");
+        data2.setAge(20);
         // todo 7、而设置绑定的实体对象，是指定的<data>标签中对应的<variable>对象，名称是<variable>中指定的name对应的名称，
         //  这样就完成了布局到对应的Activity类的绑定关系以及绑定的对象的注入
         layoutBinding.setNameEntity(data);
-
+        layoutBinding.setNameEntity2(data2);
         // todo 8、ViewDataBinding对象可以使用  【.tvName[布局文件中，声明的值]】来直接获取对应的View组件，并进行对应的操作
         layoutBinding.tvName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +71,7 @@ public class DataBindTextViewActivity extends BaseActivity<BindTextView> {
         layoutBinding.tvName3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                data.setName3(new Random().nextInt() + "-- setName3");
+                data2.setName(new Random().nextInt() + "-- setName [data2]");
                 Ulog.i(data.toString());
             }
         });
