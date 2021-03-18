@@ -26,6 +26,9 @@
         <variable
             name="nameEntity"
             type="com.meiling.databinding.viewmodel.data.Data" />
+        <variable
+            name="userPresenter"
+            type="com.meiling.databinding.databind.DataBindButtonActivity.ClickPresenter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,6 +45,7 @@
             android:textColor="#333333"
             android:padding="10dp"
             android:background="#3296fa"
+            android:onClick="@{(view)->userPresenter.doClick(view,nameEntity)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -51,20 +55,41 @@
         todo EditText 以下的写法就直接关联的Data对应的值，
          使得在进行修改的时候，TextView对应的值也在进行变更
          android:text="@={nameEntity.name}"
+
+
+
+         todo 发现以下部分在实际执行时并没有被执行【需要将LayoutDataBind对象设置该Presenter】
+          android:onClick="@{userPresenter::click}"
+          android:onClick="@{()->userPresenter.doClick(nameEntity)}"
+          android:onClick="@{(view)->userPresenter.click(view)}"
         -->
-        <EditText
+
+        <TextView
             android:id="@+id/tvName1"
-            android:layout_width="240dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@={nameEntity.name}"
             android:textSize="16dp"
             android:textColor="#333333"
             android:padding="10dp"
             android:background="#bbbbbb"
+            android:onClick="@{(view)->userPresenter.click(view)}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvName"
-            />
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
+        <TextView
+            android:id="@+id/tvName2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={nameEntity.name}"
+            android:textSize="16dp"
+            android:textColor="#333333"
+            android:padding="10dp"
+            android:background="#3296fa"
+            android:onClick="@{userPresenter::click}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName1" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
