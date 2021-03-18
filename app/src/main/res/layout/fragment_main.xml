@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="com.meiling.databinding.data2.Data"/>
+        <import type="com.meiling.databinding.viewmodel.data2.Data"/>
         <variable
             name="nameEntity"
-            type="Data" />
+            type="com.meiling.databinding.viewmodel.data2.Data" />
 
     </data>
 

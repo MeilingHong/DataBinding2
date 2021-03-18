@@ -1,4 +1,4 @@
-package com.meiling.databinding.data2;
+package com.meiling.databinding.viewmodel.data2;
 /**
  * Created by marisareimu@126.com on 2021-03-11  15:56
  * project DataBinding

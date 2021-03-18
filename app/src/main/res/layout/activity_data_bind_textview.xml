@@ -21,18 +21,11 @@
     todo 5、
      View组件中使用时，使用：@{[variable中name对应的值].需要使用到的实体类的属性}*** 例如下面的 nameEntity.name
     -->
-    <data>
+    <data class="BindTextView">
         <import type="com.meiling.databinding.viewmodel.data.Data"/>
         <variable
             name="nameEntity"
             type="com.meiling.databinding.viewmodel.data.Data" />
-
-        <import
-            alias="Data2"
-            type="com.meiling.databinding.viewmodel.data2.Data"/>
-        <variable
-            name="grander"
-            type="Data2" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,11 +37,39 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{nameEntity.name}"
+            android:text="@={nameEntity.name}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvName1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={nameEntity.name1}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName"
+            />
+
+        <TextView
+            android:id="@+id/tvName2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={nameEntity.name2}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName1" />
+
+        <TextView
+            android:id="@+id/tvName3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={nameEntity.name3}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -53,4 +53,7 @@ dependencies {
     // CameraX View class CameraX使用【说是能从Android5.0往上兼容】
     implementation 'androidx.camera:camera-view:1.0.0-alpha20'
 
+
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
 }

@@ -15,18 +15,22 @@ import android.util.Size;
 import android.view.View;
 import android.widget.Toast;
 
-import com.meiling.databinding.data.Data;
+import com.meiling.databinding.base.BaseActivity;
+import com.meiling.databinding.viewmodel.data.Data;
 import com.meiling.databinding.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private Data data;
+
+    @Override
+    protected int layoutViewId() {
+        return R.layout.activity_main;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,15 +40,14 @@ public class MainActivity extends AppCompatActivity {
 
         // todo 9、如果需要自己指定这个ViewDataBinding对象名称，需要在布局文件中进行声明
         //  <data class="CustomBinding">，其中class指定的名称即为自定义的ViewDataBinding名称
-        ActivityMainBinding activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         data = new Data();
         data.setName("自定义名称2");
         // todo 7、而设置绑定的实体对象，是指定的<data>标签中对应的<variable>对象，名称是<variable>中指定的name对应的名称，
         //  这样就完成了布局到对应的Activity类的绑定关系以及绑定的对象的注入
-        activityMainBinding.setNameEntity(data);
+        layoutBinding.setNameEntity(data);
 
         // todo 8、ViewDataBinding对象可以使用  【.tvName[布局文件中，声明的值]】来直接获取对应的View组件，并进行对应的操作
-        activityMainBinding.tvName.setOnClickListener(new View.OnClickListener() {
+        layoutBinding.tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // todo 需要申请Camera权限

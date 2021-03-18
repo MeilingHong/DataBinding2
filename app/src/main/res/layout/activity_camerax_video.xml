@@ -14,7 +14,7 @@
         <!--
         预览View
         -->
-        <androidx.camera.view.PreviewView
+        <com.meiling.databinding.camerax.video.AutoFitSurfaceView
             android:id="@+id/preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
